@@ -64,3 +64,31 @@ GROUP BY gender;
 
 SELECT gender, COUNT(id) FROM employee_payroll
 GROUP BY gender;
+
+--UC8_Extend-EmpPayroll-Data
+alter table employee_payroll add phone varchar(15);
+
+alter table employee_payroll add department varchar(25) not null default 'General';
+
+alter table employee_payroll add address varchar(50);
+
+alter table employee_payroll add constraint default_address default 'India' for address;
+
+insert into employee_payroll (name,basic_pay,start)
+values ('Satyam',105000.00,'2019-05-01');
+
+select * from employee_payroll;
+
+--UC9_Extend-To-Add-Various-Pay
+sp_rename 'employee_payroll.salary','basic_pay';
+
+alter table employee_payroll add deduction money,
+taxable_pay money, net_pay money, incomeTax real;
+
+--UC10_One-Person-In-Different-Dept
+insert into employee_payroll (name,basic_pay,start,department)
+values ('Satyam',105000.00,'2019-05-01','Sales'),
+('Satyam',105000.00,'2019-05-01','Marketing')
+;
+
+select * from employee_payroll;

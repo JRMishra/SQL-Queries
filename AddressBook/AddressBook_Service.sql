@@ -79,3 +79,11 @@ select * from address_book;
 SELECT contacttype, COUNT(id) as NumberOfContacts
 from address_book
 GROUP BY contacttype;
+
+--UC11_Add-Person-To-Friend-And-Family
+INSERT INTO address_book values
+('Satyam','Mishra','NML Colony','Ranchi','Odisha','870601','+91 7612303461','mishrasatyam@mymail.com','General','Family'),
+('Satyam','Mishra','NML Colony','Ranchi','Odisha','870601','+91 7612303461','mishrasatyam@mymail.com','General','Friend')
+;
+
+select * from address_book;
