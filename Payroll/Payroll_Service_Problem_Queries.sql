@@ -96,6 +96,7 @@ select * from employee_payroll;
 --UC11_Impliment-New-ER-Structure
 alter table employee_payroll add deptId int;
 
+--Create new Department table
 CREATE TABLE Department
 (
 id int identity(1,1),
@@ -114,31 +115,73 @@ set department = 'Production'
 where department = 'General'
 ;
 
+--update deptId in employee_payroll
 update p
 set p.deptId = d.id
 from Department d inner join employee_payroll p on d.name = p.department
 ;
 
-select * from employee_payroll;
+--delete department column in employee_payroll
+alter table employee_payroll
+drop column department;
 
-create procedure SpAddEmployeeDetails
+--Create new Payroll table
+CREATE TABLE Payroll
 (
-@EmployeeName varchar(255),
-@PhoneNumber varchar(255),
-@Address varchar(255),
-@Department varchar(255),
-@Gender char(1),
-@BasicPay float,
-@Deductions float,
-@TaxablePay float,
-@Tax float,
-@NetPay float,
-@StartDate Date
+basic_pay money primary key,
+deduction money not null,
+taxable_pay money not null,
+income_tax money not null,
+net_pay money not null
+);
+
+--Store procedure to fill payroll table
+create procedure spFillPayroll
+(
+@basic_pay money
 )
 as
 begin
-insert into employee_payroll values
+insert into Payroll values
 (
-@EmployeeName,@BasicPay,@StartDate,@Gender,@PhoneNumber,@Address,@Department,@Deductions,@TaxablePay,@Tax,@NetPay
+@basic_pay,@basic_pay*0.2,@basic_pay*0.8,@basic_pay*0.08,@basic_pay*0.92
 )
 end
+
+--Execute store procedure
+exec spFillPayroll @basic_pay = 100000;
+exec spFillPayroll @basic_pay = 105000;
+
+--drop payroll columns
+alter table employee_payroll
+drop column deduction, taxable_pay, net_pay, incomeTax;
+
+select * from employee_payroll;
+select * from Department;
+select * from Payroll;
+
+
+-- Store procedure to add employee details
+--alter procedure SpAddEmployeeDetails
+--(
+--@EmployeeName varchar(255),
+--@PhoneNumber varchar(255),
+--@Address varchar(255),
+--@Department varchar(255),
+--@Gender char(1),
+--@BasicPay float,
+--@Deductions float,
+--@TaxablePay float,
+--@Tax float,
+--@NetPay float,
+--@StartDate Date
+--)
+--as
+--begin
+--insert into employee_payroll values
+--(
+--@EmployeeName,@BasicPay,@StartDate,@Gender,@PhoneNumber,@Department,@Address,@Deductions,@TaxablePay,@NetPay,@Tax
+--)
+--end
+--;
+
