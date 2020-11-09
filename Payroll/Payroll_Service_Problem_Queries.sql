@@ -92,3 +92,53 @@ values ('Satyam',105000.00,'2019-05-01','Sales'),
 ;
 
 select * from employee_payroll;
+
+--UC11_Impliment-New-ER-Structure
+alter table employee_payroll add deptId int;
+
+CREATE TABLE Department
+(
+id int identity(1,1),
+name varchar(20) primary key
+);
+
+INSERT INTO Department
+values ('Finance'),('Sales'),('HR'),('IT'),('Production')
+;
+INSERT INTO Department
+values ('Marketing')
+;
+
+update employee_payroll
+set department = 'Production'
+where department = 'General'
+;
+
+update p
+set p.deptId = d.id
+from Department d inner join employee_payroll p on d.name = p.department
+;
+
+select * from employee_payroll;
+
+create procedure SpAddEmployeeDetails
+(
+@EmployeeName varchar(255),
+@PhoneNumber varchar(255),
+@Address varchar(255),
+@Department varchar(255),
+@Gender char(1),
+@BasicPay float,
+@Deductions float,
+@TaxablePay float,
+@Tax float,
+@NetPay float,
+@StartDate Date
+)
+as
+begin
+insert into employee_payroll values
+(
+@EmployeeName,@BasicPay,@StartDate,@Gender,@PhoneNumber,@Address,@Department,@Deductions,@TaxablePay,@Tax,@NetPay
+)
+end
