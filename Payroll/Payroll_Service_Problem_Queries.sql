@@ -136,11 +136,17 @@ net_pay money not null
 );
 
 --Store procedure to fill payroll table
-create procedure spFillPayroll
+alter procedure spFillPayroll
 (
 @basic_pay money
 )
 as
+DECLARE	@count int
+begin
+select @count = count(basic_pay) from Payroll
+where basic_pay = @basic_pay
+end
+if(@count=0)
 begin
 insert into Payroll values
 (
@@ -150,38 +156,70 @@ end
 
 --Execute store procedure
 exec spFillPayroll @basic_pay = 100000;
-exec spFillPayroll @basic_pay = 105000;
+select * from Payroll;
+exec spFillPayroll @basic_pay = 115000;
 
 --drop payroll columns
 alter table employee_payroll
 drop column deduction, taxable_pay, net_pay, incomeTax;
 
+--Store procedure to count dept
+alter procedure spCountDept
+( @deptname nvarchar(25))
+as
+DECLARE	@count int
+begin
+select @count = count(id) from Department
+where name = @deptname
+end
+if(@count=0)
+begin
+insert into Department values
+(
+@deptname
+)
+end
+;
+
+EXEC spCountDept @deptname = N'Acquisition'
+		;
+SELECT	* from Department;
+
+-- Store procedure to add employee details
+alter procedure SpAddEmployeeDetails
+(
+@EmployeeName varchar(255),
+@PhoneNumber varchar(255),
+@Address varchar(255),
+@Gender char(1),
+@BasicPay money,
+@StartDate Date,
+@Department varchar(20)
+)
+as
+begin
+EXEC [dbo].[spCountDept] @deptname = @Department
+end
+begin
+declare @DeptId int
+select @DeptId = id from Department where name = @Department
+end
+begin
+exec spFillPayroll @basic_pay = @BasicPay;
+end
+begin
+insert into employee_payroll values
+(
+@EmployeeName,@BasicPay,@StartDate,@Gender,@PhoneNumber,@Address,@DeptId
+)
+end
+;
+
+
 select * from employee_payroll;
 select * from Department;
 select * from Payroll;
 
-
--- Store procedure to add employee details
---alter procedure SpAddEmployeeDetails
---(
---@EmployeeName varchar(255),
---@PhoneNumber varchar(255),
---@Address varchar(255),
---@Department varchar(255),
---@Gender char(1),
---@BasicPay float,
---@Deductions float,
---@TaxablePay float,
---@Tax float,
---@NetPay float,
---@StartDate Date
---)
---as
---begin
---insert into employee_payroll values
---(
---@EmployeeName,@BasicPay,@StartDate,@Gender,@PhoneNumber,@Department,@Address,@Deductions,@TaxablePay,@NetPay,@Tax
---)
---end
---;
-
+exec SpAddEmployeeDetails  @EmployeeName = 'Sonali',@BasicPay= 90000,@StartDate= '2020-07-15',@Gender='F',
+@PhoneNumber = '7710176152', @Address = 'Bhubaneswar', @Department = 'Sales'
+;
